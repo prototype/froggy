@@ -35,19 +35,42 @@ module Froggy
 			@y > (@level.height - SUPER_JUMP_HEIGHT)
 		end
 
+		def want_to_move_left?
+			@level.window.button_down?(Gosu::KbLeft) && can_move_left?
+		end
+
+		def want_to_move_right?
+			@level.window.button_down?(Gosu::KbRight) && can_move_right?
+		end
+
+		def can_move_left?
+			@x > 0
+		end
+
+		def can_move_right?
+			@x < (@level.width - @sprite_width)
+		end
+
+		def move_left!
+			@x -= @x_velocity
+			@x = 0 if @x < 0
+		end
+
+		def move_right!
+			x_max = @level.width - @sprite_width
+			@x += @x_velocity
+			@x = x_max if @x > x_max
+		end
+
 		def update
 			w = @level.window
 
-			x_max = @level.width - @sprite_width
-
-			if w.button_down?(Gosu::KbLeft) && @x > 0
-				@x -= @x_velocity
-				@x = 0 if @x < 0
+			if want_to_move_left?
+				move_left!
 			end
 
-			if w.button_down?(Gosu::KbRight) && @x <= x_max
-				@x += @x_velocity
-				@x = x_max if @x > x_max
+			if want_to_move_right?
+				move_right!
 			end
 
 			if w.button_down?(Gosu::KbUp) && !jumping?
@@ -89,10 +112,23 @@ module Froggy
 			)
 
 			@y = @level.height - @sprite_height
+
+			@dy = 0
+		end
+
+		def animate_move_hop
+			puts (can_move_right?)
+			if (want_to_move_left? && can_move_left?) || (want_to_move_right? && can_move_right?)
+				@dy += Math.sin(@x) * 8
+			else
+				@dy = 0
+			end
 		end
 
 		def draw
-			@body_sprite.draw(@x, @y, ZOrder::Player)
+			animate_move_hop
+			@legs_sprite.draw(@x, @y + 50 + @dy, ZOrder::Player)
+			@body_sprite.draw(@x + 30, @y + 10, ZOrder::Player)
 		end
 	end
 end

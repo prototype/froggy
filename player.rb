@@ -27,7 +27,7 @@ module Froggy
 			@sprite_height = 0
 
 
-			@x = 0
+			@x = (@level.width / 2).to_i
 			@y = @level.height - 100
 		end
 
@@ -38,12 +38,16 @@ module Froggy
 		def update
 			w = @level.window
 
+			x_max = @level.width - @sprite_width
+
 			if w.button_down?(Gosu::KbLeft) && @x > 0
 				@x -= @x_velocity
+				@x = 0 if @x < 0
 			end
 
-			if w.button_down?(Gosu::KbRight) && @x <= (@level.width - @sprite_width)
+			if w.button_down?(Gosu::KbRight) && @x <= x_max
 				@x += @x_velocity
+				@x = x_max if @x > x_max
 			end
 
 			if w.button_down?(Gosu::KbUp) && !jumping?

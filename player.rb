@@ -5,7 +5,7 @@ require './zorder'
 
 module Froggy
 	class Player
-		JUMP_HEIGHT = 20
+		JUMP_HEIGHT = 400
 		SUPER_JUMP_HEIGHT = 30
 
 		attr_accessor :jump_height
@@ -15,6 +15,7 @@ module Froggy
 		attr_accessor :y
 
 		attr_accessor :x_velocity
+		attr_accessor :y_velocity
 
 		attr_accessor :sprite_height
 		attr_accessor :sprite_width
@@ -23,16 +24,29 @@ module Froggy
 			@level = level
 
 			@x_velocity = 10
+			@y_velocity = 20
+
 			@sprite_width = 0
 			@sprite_height = 0
 
+
+			@jumping = false
 
 			@x = (@level.width / 2).to_i
 			@y = @level.height - 100
 		end
 
 		def jumping?
-			@y > (@level.height - SUPER_JUMP_HEIGHT)
+			@jumping
+			#@y + @sprite_height < @level.height
+		end
+
+		def grounded?
+			@y + @sprite_height >= @level.height
+		end
+
+		def can_jump?
+			!jumping?
 		end
 
 		def want_to_move_left?
@@ -41,6 +55,10 @@ module Froggy
 
 		def want_to_move_right?
 			@level.window.button_down?(Gosu::KbRight) && can_move_right?
+		end
+
+		def want_to_jump?
+			@level.window.button_down?(Gosu::KbUp)
 		end
 
 		def can_move_left?
@@ -62,6 +80,11 @@ module Froggy
 			@x = x_max if @x > x_max
 		end
 
+		def jump!
+			return if jumping?
+			@jumping = true
+		end
+
 		def update
 			w = @level.window
 
@@ -73,8 +96,8 @@ module Froggy
 				move_right!
 			end
 
-			if w.button_down?(Gosu::KbUp) && !jumping?
-				# Jump!
+			if want_to_jump? && can_jump?
+				jump!
 			end
 
 			if w.button_down?(Gosu::KbSpace)
@@ -88,6 +111,8 @@ module Froggy
 	end
 
 	class FroggyPlayer < Player
+		HOP_HEIGHT = 8
+
 		def initialize(level)
 			super(level)
 
@@ -116,9 +141,30 @@ module Froggy
 			@dy = 0
 		end
 
+		def animate_jump
+			return if !jumping?
+
+			@dy = 30
+
+			if @y <= (@level.height - JUMP_HEIGHT)
+				@y_velocity *= -1
+			end
+
+
+			@y -= @y_velocity
+
+			if grounded?
+				@y_velocity *= -1
+				@y = @level.height - @sprite_height
+				@jumping = false
+			end			
+
+		end
+
 		def animate_move_hop
-			if (want_to_move_left? && can_move_left?) || (want_to_move_right? && can_move_right?)
-				@dy += Math.sin(@x) * 8
+			return if jumping?
+			if (want_to_move_left? && can_move_left?) ^ (want_to_move_right? && can_move_right?)
+				@dy = -1 * (Math.sin(@x / 2.0) * HOP_HEIGHT).to_i.abs
 			else
 				@dy = 0
 			end
@@ -126,7 +172,8 @@ module Froggy
 
 		def draw
 			animate_move_hop
-			@legs_sprite.draw(@x, @y + 50 + @dy, ZOrder::Player)
+			animate_jump
+			@legs_sprite.draw(@x,      @y + 50 + @dy, ZOrder::Player)
 			@body_sprite.draw(@x + 30, @y + 10, ZOrder::Player)
 		end
 	end

@@ -24,11 +24,6 @@ module Froggy
 
 			@width  = window.width
 			@height = window.height
-
-			@targets << BeeTarget.new(self).randomize_position_and_velocity
-			@targets << BeeTarget.new(self).randomize_position_and_velocity
-			@targets << BeeTarget.new(self).randomize_position_and_velocity
-			@targets << BeeTarget.new(self).randomize_position_and_velocity
 		end
 
 		# Helper method in generating random targets for us.
@@ -50,6 +45,17 @@ module Froggy
 		def draw
 			@targets.each { |t| t.draw }
 		end
+	end
 
+	class Level1 < GameLevel
+		def initialize(window)
+			super(1, window, './img/level_1_bg.png')
+
+			8.times {
+				target = BeeTarget.new(self)
+				target.randomize_position_and_velocity
+				@targets << target
+			}
+		end
 	end
 end

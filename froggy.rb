@@ -12,5 +12,4 @@ require './game_window'
 require './game_level'
 
 window = Froggy::GameWindow.new
-window.level = Froggy::GameLevel.new(1, window, './img/level_1_bg.png')
 window.show

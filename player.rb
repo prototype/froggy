@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'gosu'
 
+require './zorder'
+
 module Froggy
 	class Player
 		JUMP_HEIGHT = 20
@@ -12,11 +14,21 @@ module Froggy
 		attr_accessor :x
 		attr_accessor :y
 
+		attr_accessor :x_velocity
+
+		attr_accessor :sprite_height
+		attr_accessor :sprite_width
+
 		def initialize(level)
 			@level = level
 
+			@x_velocity = 10
+			@sprite_width = 0
+			@sprite_height = 0
+
+
 			@x = 0
-			@y = 0
+			@y = @level.height - 100
 		end
 
 		def jumping?
@@ -25,12 +37,13 @@ module Froggy
 
 		def update
 			w = @level.window
+
 			if w.button_down?(Gosu::KbLeft) && @x > 0
-				x -= 1
+				@x -= @x_velocity
 			end
 
-			if w.button_down?(Gosu::KbRight) && @x < @level.width
-				x += 1
+			if w.button_down?(Gosu::KbRight) && @x <= (@level.width - @sprite_width)
+				@x += @x_velocity
 			end
 
 			if w.button_down?(Gosu::KbUp) && !jumping?
@@ -43,13 +56,18 @@ module Froggy
 		end
 
 		def draw
+			raise "Must be overridden in subclass!"
 		end
 	end
 
-	class Froggy < Player
+	class FroggyPlayer < Player
 		def initialize(level)
 			super(level)
-			@froggy_body_sprite = Gosu::Image.new(level.window,
+
+			@sprite_width = 109
+			@sprite_height = 100
+
+			@body_sprite = Gosu::Image.new(level.window,
 				'./img/froggy_body.png',
 				false,
 				0,
@@ -57,7 +75,7 @@ module Froggy
 				49,
 				77
 			)
-			@froggy_body_sprite = Gosu::Image.new(level.window,
+			@legs_sprite = Gosu::Image.new(level.window,
 				'./img/froggy_legs.png',
 				false,
 				0,
@@ -65,6 +83,12 @@ module Froggy
 				109,
 				50
 			)
+
+			@y = @level.height - @sprite_height
+		end
+
+		def draw
+			@body_sprite.draw(@x, @y, ZOrder::Player)
 		end
 	end
 end

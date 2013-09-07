@@ -12,7 +12,7 @@ module Froggy
 		def initialize
 			super(1024, 768, false)
 			@level = Level1.new(self)
-			@player = Player.new(@level)
+			@player = FroggyPlayer.new(@level)
 		end
 
 		def update
@@ -23,7 +23,7 @@ module Froggy
 		def draw
 			@level.background_image.draw(0, 0, ZOrder::Background)
 			@level.draw
-			#@player.draw
+			@player.draw
 		end
 	end
 end

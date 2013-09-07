@@ -22,10 +22,13 @@ module Froggy
 			@enemies = []
 			@targets = []
 
-			@targets << BeeTarget.new(self)
-
 			@width  = window.width
 			@height = window.height
+
+			@targets << BeeTarget.new(self).randomize_position_and_velocity
+			@targets << BeeTarget.new(self).randomize_position_and_velocity
+			@targets << BeeTarget.new(self).randomize_position_and_velocity
+			@targets << BeeTarget.new(self).randomize_position_and_velocity
 		end
 
 		# Helper method in generating random targets for us.

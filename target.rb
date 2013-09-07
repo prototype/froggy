@@ -31,6 +31,15 @@ module Froggy
 			@sprite_tile_height = sprite_tile_height
 		end
 
+		def randomize_position_and_velocity
+			@x = Random.rand(@level.width  - @sprite_tile_width)
+			@y = Random.rand(@level.height - @sprite_tile_height)
+
+			@x_velocity *= [-1, 1].sample
+			@y_velocity *= [-1, 1].sample
+			self
+		end
+
 		def update_velocity
 			if @x <= 0 || @x >= @level.width - @sprite_tile_width
 				@x_velocity *= -1;
@@ -60,8 +69,6 @@ module Froggy
 			update_x
 			update_y
 			update_velocity
-
-#			puts @x
 		end
 
 		def draw
@@ -77,10 +84,4 @@ module Froggy
 			@y_velocity = 7
 		end
 	end
-
-	#class FlyTarget < Target
-	#	def initialize(level)
-	#		super(level, './img/fly.png')
-	#	end
-	#end
 end

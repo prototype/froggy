@@ -1,5 +1,5 @@
 #
-# An fast implementation of a frog game to help folks from the UvA
+# A fast implementation of a frog game to help folks from the UvA
 # minor programming start getting interested in becoming game devs.
 #
 # Copyright (c) 2013 Ninh Bui

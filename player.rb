@@ -117,7 +117,6 @@ module Froggy
 		end
 
 		def animate_move_hop
-			puts (can_move_right?)
 			if (want_to_move_left? && can_move_left?) || (want_to_move_right? && can_move_right?)
 				@dy += Math.sin(@x) * 8
 			else
